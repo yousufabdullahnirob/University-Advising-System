@@ -20,20 +20,17 @@ def landing_page(request):
 
 def student_login_view(request):
     if request.method == 'POST':
-        print("DEBUG: Student login POST received")
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
             user = form.get_user()
-            print(f"DEBUG: User {user.username} authenticated. is_staff={user.is_staff}")
             if not user.is_staff:
                 login(request, user)
-                print("DEBUG: Login successful, redirecting to dashboard")
                 return redirect('student_dashboard')
             else:
-                print("DEBUG: User is staff, denying student login")
                 messages.error(request, "This login is for Students only.")
         else:
-            print(f"DEBUG: Form errors: {form.errors}")
+            # Form errors are handled by the template
+            pass
     else:
         form = AuthenticationForm()
     return render(request, 'advising_app/student_login.html', {'form': form})
@@ -97,6 +94,9 @@ def logout_view(request):
 
 @login_required
 def student_dashboard(request):
+    """
+    Displays the student's dashboard with enrolled courses and current balance.
+    """
     if request.user.is_staff:
         return redirect('admin_dashboard')
     
@@ -124,6 +124,10 @@ def student_dashboard(request):
 
 @login_required
 def advising_view(request):
+    """
+    Handles the student advising process, including course selection,
+    conflict detection (time, credit limit), and enrollment.
+    """
     try:
         student = request.user.student
     except Student.DoesNotExist:
