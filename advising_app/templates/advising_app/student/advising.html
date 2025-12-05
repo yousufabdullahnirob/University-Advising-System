@@ -1,0 +1,81 @@
+{% extends 'advising_app/base.html' %}
+
+{% block title %}Advising{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Advising Panel</h2>
+    <a href="{% url 'student_dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+</div>
+
+<div class="alert alert-info">
+    <strong>Instructions:</strong> Select courses to enroll. Courses that clash with your current schedule are disabled.
+    <br>
+    <strong>Total Credits:</strong> {{ total_credits }} / 15
+    <br>
+    <strong>Total Cost:</strong> {{ total_cost }} BDT
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Code</th>
+                        <th>Section</th>
+                        <th>Schedule</th>
+                        <th>Credit</th>
+                        <th>Seats</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in courses %}
+                    <tr
+                        class="{% if item.status == 'Enrolled' %}table-success{% elif item.status == 'Clash' %}table-danger{% endif %}">
+                        <td>{{ item.course.code }}</td>
+                        <td>{{ item.course.section }}</td>
+                        <td>
+                            <strong>{{ item.course.get_day_display }}</strong><br>
+                            {{ item.course.start_time }} - {{ item.course.end_time }}
+                        </td>
+                        <td>{{ item.course.credit }}</td>
+                        <td>{{ item.enrolled_count }}/{{ item.course.capacity }}</td>
+                        <td>
+                            {% if item.status == 'Enrolled' %}
+                            <span class="badge bg-success">Enrolled</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if item.status == 'Enrolled' %}
+                            <form method="post" action="{% url 'advising_view' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="course_id" value="{{ item.course.id }}">
+                                <input type="hidden" name="action" value="drop">
+                                <button type="submit" class="btn btn-danger btn-sm">Drop</button>
+                            </form>
+                            {% elif item.status == 'Available' %}
+                            <form method="post" action="{% url 'advising_view' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="course_id" value="{{ item.course.id }}">
+                                <input type="hidden" name="action" value="add">
+                                <button type="submit" class="btn btn-primary btn-sm">Add</button>
+                            </form>
+                            {% elif item.status == 'Taken' %}
+                            <button class="btn btn-secondary btn-sm" disabled>Taken</button>
+                            {% elif item.status == 'Full' %}
+                            <button class="btn btn-secondary btn-sm" disabled>Full</button>
+                            {% else %}
+                            <button class="btn btn-secondary btn-sm" disabled>Clash</button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends 'advising_app/base.html' %}
+
+{% block title %}Submit Advising Request{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Submit Advising Request</h2>
+    <a href="{% url 'student_dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="alert alert-info">
+                        Select courses in order of preference. The order you select them will be their priority.
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Select Courses</label>
+                        <div class="list-group">
+                            {% for course in courses %}
+                            <label class="list-group-item">
+                                <input class="form-check-input me-1" type="checkbox" name="courses"
+                                    value="{{ course.id }}">
+                                <strong>{{ course.code }}</strong> - {{ course.title }} ({{ course.credit }} Cr)
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Submit Request</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

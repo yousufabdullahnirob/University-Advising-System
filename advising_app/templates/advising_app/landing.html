@@ -1,0 +1,44 @@
+{% extends 'advising_app/base.html' %}
+
+{% block title %}Welcome to Advising System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-8 text-center">
+        <h1 class="display-4 mb-4">Welcome to Advising System</h1>
+        <p class="lead mb-5">Please select your role to continue.</p>
+
+        <div class="row justify-content-center gap-4">
+            <div class="col-md-3">
+                <div class="card h-100 border-primary">
+                    <div class="card-body">
+                        <h3 class="card-title text-primary">Student</h3>
+                        <p class="card-text">Access course list and submit advising requests.</p>
+                        <a href="{% url 'student_login' %}" class="btn btn-primary btn-lg w-100">Student Login</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card h-100 border-dark">
+                    <div class="card-body">
+                        <h3 class="card-title text-dark">Admin</h3>
+                        <p class="card-text">Manage courses, faculty, and approve requests.</p>
+                        <a href="{% url 'admin_login' %}" class="btn btn-dark btn-lg w-100">Admin Login</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card h-100 border-success">
+                    <div class="card-body">
+                        <h3 class="card-title text-success">Faculty</h3>
+                        <p class="card-text">View assigned courses and schedule.</p>
+                        <a href="{% url 'faculty_login' %}" class="btn btn-success btn-lg w-100">Faculty Login</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

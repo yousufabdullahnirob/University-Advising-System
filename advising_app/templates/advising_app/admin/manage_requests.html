@@ -1,0 +1,44 @@
+{% extends 'advising_app/base.html' %}
+
+{% block title %}Manage Requests{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Manage Advising Requests</h2>
+    <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if requests %}
+        {% for req in requests %}
+        <div class="card mb-3 border-primary">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    Request by: {{ req.student.user.get_full_name }} ({{ req.student.student_id }})
+                </h5>
+                <small>{{ req.created_at|date:"M d, Y H:i" }}</small>
+            </div>
+            <div class="card-body">
+                <h6>Preferred Courses:</h6>
+                <ul class="list-group mb-3">
+                    {% for pref in req.preferred_courses.all %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ pref.course.code }} - {{ pref.course.title }}
+                        <span class="badge bg-secondary">Priority {{ pref.priority }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="{% url 'approve_request' req.id %}" class="btn btn-success">Approve</a>
+                    <a href="{% url 'reject_request' req.id %}" class="btn btn-danger">Reject</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="alert alert-info text-center">No pending requests.</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

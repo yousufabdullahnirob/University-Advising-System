@@ -1,0 +1,104 @@
+{% extends 'advising_app/base.html' %}
+
+{% block title %}Assign Advisors{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Assign Advisors</h2>
+    <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3 align-items-center">
+            <div class="col-auto">
+                <label for="department" class="col-form-label">Select Department:</label>
+            </div>
+            <div class="col-auto">
+                <select name="department" id="department" class="form-select" onchange="this.form.submit()">
+                    <option value="">-- Select --</option>
+                    {% for dept in departments %}
+                    <option value="{{ dept }}" {% if dept==selected_dept %}selected{% endif %}>{{ dept }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if selected_dept %}
+<form method="post">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Students in {{ selected_dept }}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th style="width: 40px;"><input type="checkbox" id="selectAll"></th>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Current Advisor</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for student in students %}
+                                <tr>
+                                    <td><input type="checkbox" name="student_ids" value="{{ student.id }}"
+                                            class="student-checkbox"></td>
+                                    <td>{{ student.student_id }}</td>
+                                    <td>{{ student.user.get_full_name }}</td>
+                                    <td>
+                                        {% if student.advisor %}
+                                        <span class="badge bg-success">{{ student.advisor.user.get_full_name }}</span>
+                                        {% else %}
+                                        <span class="badge bg-warning text-dark">Unassigned</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card sticky-top" style="top: 20px;">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Assign To</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="advisor_id" class="form-label">Select Faculty Advisor:</label>
+                        <select name="advisor_id" id="advisor_id" class="form-select" required size="10">
+                            {% for faculty in faculty_members %}
+                            <option value="{{ faculty.id }}">
+                                {{ faculty.user.get_full_name }} ({{ faculty.advisee_count }}/50)
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Assign Selected Students</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+    document.getElementById('selectAll').addEventListener('change', function () {
+        var checkboxes = document.getElementsByClassName('student-checkbox');
+        for (var i = 0; i < checkboxes.length; i++) {
+            checkboxes[i].checked = this.checked;
+        }
+    });
+</script>
+{% endif %}
+{% endblock %}

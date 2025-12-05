@@ -1,0 +1,93 @@
+{% extends 'advising_app/base.html' %}
+
+{% block title %}Student Dashboard{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h2>Student Dashboard</h2>
+        {% if student %}
+        <p class="lead">Welcome, {{ student.user.get_full_name }} ({{ student.student_id }})</p>
+        <p>Department: {{ student.department }}</p>
+        {% else %}
+        <div class="alert alert-warning">Student profile not found. Please contact admin.</div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row mb-4">
+    <!-- Financial Info -->
+    <div class="col-md-4">
+        <div class="card bg-light">
+            <div class="card-body text-center">
+                <h5>Payable Amount</h5>
+                <h2 class="text-primary">{{ payable_amount }} BDT</h2>
+            </div>
+        </div>
+    </div>
+    <!-- CGPA Info -->
+    <div class="col-md-4">
+        <div class="card bg-light">
+            <div class="card-body text-center">
+                <h5>CGPA</h5>
+                <h2 class="text-success">{{ student.cgpa }}</h2>
+            </div>
+        </div>
+    </div>
+    <!-- Actions -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body d-grid gap-2">
+                <a href="{% url 'advising_view' %}" class="btn btn-primary btn-lg">Go to Advising</a>
+                <a href="{% url 'course_list' %}" class="btn btn-info text-white">View All Courses</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">My Class Schedule</div>
+            <div class="card-body">
+                {% if enrollments %}
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Course Code</th>
+                                <th>Title</th>
+                                <th>Day</th>
+                                <th>Time</th>
+                                <th>Faculty</th>
+                                <th>Credit</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for enrollment in enrollments %}
+                            <tr>
+                                <td>{{ enrollment.course.code }}</td>
+                                <td>{{ enrollment.course.title }}</td>
+                                <td>{{ enrollment.course.get_day_display }}</td>
+                                <td>{{ enrollment.course.start_time }} - {{ enrollment.course.end_time }}</td>
+                                <td>
+                                    {% if enrollment.course.assigned_faculty %}
+                                    {{ enrollment.course.assigned_faculty.user.get_full_name }}
+                                    {% else %}
+                                    TBA
+                                    {% endif %}
+                                </td>
+                                <td>{{ enrollment.course.credit }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted text-center">No courses enrolled yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

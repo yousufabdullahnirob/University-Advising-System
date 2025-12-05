@@ -1,0 +1,106 @@
+{% extends 'advising_app/base.html' %}
+
+{% block title %}Faculty Dashboard{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Faculty Dashboard</h2>
+    <div>
+        <span class="me-3">Welcome, {{ faculty.user.first_name }} {{ faculty.user.last_name }}</span>
+        <a href="{% url 'logout' %}" class="btn btn-outline-danger">Logout</a>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h4 class="mb-0">Assigned Courses</h4>
+    </div>
+    <div class="card-body">
+        {% if courses %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Title</th>
+                        <th>Section</th>
+                        <th>Schedule</th>
+                        <th>Room</th>
+                        <th>Credits</th>
+                        <th>Capacity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for course in courses %}
+                    <tr>
+                        <td>{{ course.code }}</td>
+                        <td>{{ course.title }}</td>
+                        <td>{{ course.section }}</td>
+                        <td>
+                            <strong>{{ course.get_day_display }}</strong><br>
+                            {{ course.start_time }} - {{ course.end_time }}
+                        </td>
+                        <td>{{ course.room }}</td>
+                        <td>{{ course.credit }}</td>
+                        <td>
+                            <form method="post" action="{% url 'update_course_capacity' course.id %}"
+                                class="d-flex align-items-center">
+                                {% csrf_token %}
+                                <input type="number" name="capacity" value="{{ course.capacity }}"
+                                    class="form-control form-control-sm me-2" style="width: 70px;">
+                                <button type="submit" class="btn btn-sm btn-outline-primary">Update</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted">No courses assigned yet.</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">My Advisees</h4>
+        <form method="get" class="d-flex">
+            <input class="form-control me-2" type="search" name="q" placeholder="Search Student ID" aria-label="Search"
+                value="{{ request.GET.q|default:'' }}">
+            <button class="btn btn-light" type="submit">Search</button>
+        </form>
+    </div>
+    <div class="card-body">
+        {% if advisees %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Student ID</th>
+                        <th>Name</th>
+                        <th>Department</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in advisees %}
+                    <tr>
+                        <td>{{ student.student_id }}</td>
+                        <td>{{ student.user.get_full_name }}</td>
+                        <td>{{ student.department }}</td>
+                        <td>
+                            <a href="{% url 'advisee_detail' student.student_id %}"
+                                class="btn btn-sm btn-info text-white">Manage</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted">No advisees found.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

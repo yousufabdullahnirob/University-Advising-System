@@ -1,0 +1,83 @@
+{% extends 'advising_app/base.html' %}
+
+{% block title %}Advisee Detail{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Advisee: {{ student.user.get_full_name }} ({{ student.student_id }})</h2>
+    <a href="{% url 'faculty_dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Current Enrollments</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Total Credits:</strong> {{ total_credits }}</p>
+                {% if enrollments %}
+                <ul class="list-group">
+                    {% for enrollment in enrollments %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ enrollment.course.code }}</strong> - {{ enrollment.course.title }} (Sec: {{
+                            enrollment.course.section }})
+                            <br>
+                            <small>{{ enrollment.course.get_day_display }} {{ enrollment.course.start_time }}-{{
+                                enrollment.course.end_time }}</small>
+                        </div>
+                        <form method="post" action="{% url 'advisor_add_drop_course' student.student_id %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="course_id" value="{{ enrollment.course.id }}">
+                            <input type="hidden" name="action" value="drop">
+                            <button type="submit" class="btn btn-danger btn-sm">Drop</button>
+                        </form>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-muted">No courses enrolled.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">Add Course</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                    <table class="table table-sm table-hover">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Sec</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for course in all_courses %}
+                            <tr>
+                                <td>{{ course.code }}</td>
+                                <td>{{ course.section }}</td>
+                                <td>
+                                    <form method="post" action="{% url 'advisor_add_drop_course' student.student_id %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="course_id" value="{{ course.id }}">
+                                        <input type="hidden" name="action" value="add">
+                                        <button type="submit" class="btn btn-success btn-sm">Add</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
